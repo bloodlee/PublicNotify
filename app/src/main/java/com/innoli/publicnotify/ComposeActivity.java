@@ -1,6 +1,7 @@
 package com.innoli.publicnotify;
 
 import android.content.SharedPreferences;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.widget.EditText;
 
 import com.google.common.base.Strings;
 import com.innoli.publicnotify.preferences.PreferenceNames;
+import com.innoli.publicnotify.services.GcmSender;
 
 import java.text.MessageFormat;
 
@@ -59,5 +61,15 @@ public class ComposeActivity extends AppCompatActivity {
 
     Log.d(ComposeActivity.class.getName(),
         MessageFormat.format("send message {0}: {1}", senderName, message));
+
+    int SDK_INT = android.os.Build.VERSION.SDK_INT;
+    if (SDK_INT > 8)
+    {
+      StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+          .permitAll().build();
+      StrictMode.setThreadPolicy(policy);
+    }
+
+    GcmSender.send(senderName, message);
   }
 }

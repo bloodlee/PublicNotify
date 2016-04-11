@@ -11,4 +11,8 @@ public interface PreferenceNames {
 
   String MESSAGE_PREF = "message";
 
+  String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+
+  String REGISTRATION_COMPLETE = "registrationComplete";
+
 }
