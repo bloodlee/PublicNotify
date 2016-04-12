@@ -1,5 +1,6 @@
 package com.innoli.publicnotify;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.common.base.Strings;
 import com.innoli.publicnotify.preferences.PreferenceNames;
@@ -71,5 +73,12 @@ public class ComposeActivity extends AppCompatActivity {
     }
 
     GcmSender.send(senderName, message);
+
+    Toast toast =
+        Toast.makeText(getApplicationContext(), "Message has been sent!", Toast.LENGTH_SHORT);
+    toast.show();
+
+    // close and back to previous activity.
+    finish();
   }
 }

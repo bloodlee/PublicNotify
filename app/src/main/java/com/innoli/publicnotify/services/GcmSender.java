@@ -61,7 +61,7 @@ public class GcmSender {
       jData.put("now", seconds);
       Log.d(TAG, "now is " + seconds);
 
-      if (Strings.isNullOrEmpty(deviceId)) {
+      if (!Strings.isNullOrEmpty(deviceId)) {
         jData.put("device_id", deviceId);
       }
       Log.d(TAG, "device id " + deviceId);
@@ -103,4 +103,7 @@ public class GcmSender {
 
   }
 
+  public static String getDeviceId() {
+    return deviceId;
+  }
 }

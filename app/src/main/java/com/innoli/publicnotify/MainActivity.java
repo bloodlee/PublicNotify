@@ -7,13 +7,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity
   private BroadcastReceiver mRegistrationBroadcastReceiver;
 
   private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+  private static final int REQUEST_CODE_ASK_PERMISSIONS = 999;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -87,10 +91,15 @@ public class MainActivity extends AppCompatActivity
       }
     };
 
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_GRANTED) {
-      LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-      LocationProvider.getInstance().setLocatiotManager(locationManager);
+    int hasFineLocPermission =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+    if (hasFineLocPermission != PackageManager.PERMISSION_GRANTED) {
+      ActivityCompat.requestPermissions(
+          this,
+          new String[] { Manifest.permission.ACCESS_FINE_LOCATION },
+          REQUEST_CODE_ASK_PERMISSIONS);
+    } else {
+      updateLocationProvider();
     }
 
     String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -136,6 +145,26 @@ public class MainActivity extends AppCompatActivity
 //    }
 
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                         @NonNull int[] grantResults) {
+    switch (requestCode) {
+      case REQUEST_CODE_ASK_PERMISSIONS:
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          updateLocationProvider();
+        }
+        break;
+      default:
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+  }
+
+  private void updateLocationProvider() {
+    LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+    LocationProvider.getInstance().setLocatiotManager(locationManager);
+    LocationProvider.getInstance().startGettingLocation();
   }
 
   @SuppressWarnings("StatementWithEmptyBody")
@@ -211,12 +240,15 @@ public class MainActivity extends AppCompatActivity
   protected void onResume() {
     super.onResume();
     registerReceiver();
+    LocationProvider.getInstance().startGettingLocation();
   }
 
   @Override
   protected void onPause() {
     LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
     isReceiverRegistered = false;
+
+    LocationProvider.getInstance().stopGettingLocation();
     super.onPause();
   }
 

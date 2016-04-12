@@ -13,16 +13,36 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.innoli.publicnotify.MainActivity;
 import com.innoli.publicnotify.R;
 
-public class DcGcmListenerService extends GcmListenerService {
+import java.text.MessageFormat;
 
-    private static final String TAG = "DcGcmListenerService";
+public class PnGcmListenerService extends GcmListenerService {
+
+    private static final String TAG = "PnGcmListenerService";
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
+        String sender = data.getString("sender");
+
+        String deviceId = data.getString("device_id");
+
+        if (Objects.equal(deviceId, GcmSender.getDeviceId())) {
+            Log.d(TAG, "device id are the same. The message is from current device.");
+        }
+
+        if (Strings.isNullOrEmpty(message)) {
+            message = "";
+        }
+
+        if (Strings.isNullOrEmpty(sender)) {
+            sender = "anonymous";
+        }
+
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + message);
 
@@ -30,10 +50,10 @@ public class DcGcmListenerService extends GcmListenerService {
 
         }
 
-        sendNotification(message);
+        sendNotification(sender, message);
     }
 
-    private void sendNotification(String message) {
+    private void sendNotification(String sender, String message) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -42,8 +62,10 @@ public class DcGcmListenerService extends GcmListenerService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat_notification)
-                .setContentTitle("Dinner is Coming")
-                .setContentText("Dinner is just arrived! Come quickly!")
+                .setContentTitle("You got a new message!")
+                .setContentText(
+                    MessageFormat.format("{0} from: {1}", message, sender)
+                )
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
