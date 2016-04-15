@@ -1,20 +1,29 @@
 package com.innoli.publicnotify;
 
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.common.base.Strings;
+import com.innoli.publicnotify.activities.ReceiverInfoActivity;
 import com.innoli.publicnotify.preferences.PreferenceNames;
 import com.innoli.publicnotify.services.GcmSender;
+
+import org.w3c.dom.Text;
 
 import java.text.MessageFormat;
 
@@ -25,23 +34,62 @@ public class ComposeActivity extends AppCompatActivity {
 
   private EditText senderNameEditText;
   private EditText msgEditText;
+  private TextView msgLabel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_compose);
 
-    senderNameEditText = (EditText) findViewById(R.id.sender_input);
-    msgEditText = (EditText) findViewById(R.id.message_input);
+//    senderNameEditText = (EditText) findViewById(R.id.sender_input);
+//    msgEditText = (EditText) findViewById(R.id.message_input);
+//
+//    SharedPreferences prefs =
+//        getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE);
+//
+//    String senderName = prefs.getString(PreferenceNames.SENDER_NAME_PREF, "");
+//    String message = prefs.getString(PreferenceNames.MESSAGE_PREF, "");
+//
+//    senderNameEditText.setText(senderName);
+//    msgEditText.setText(message);
 
-    SharedPreferences prefs =
-        getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE);
+    ImageButton editToButton = (ImageButton) findViewById(R.id.editTo);
+    editToButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(ComposeActivity.this, ReceiverInfoActivity.class);
+        startActivity(intent);
+      }
+    });
 
-    String senderName = prefs.getString(PreferenceNames.SENDER_NAME_PREF, "");
-    String message = prefs.getString(PreferenceNames.MESSAGE_PREF, "");
+    msgLabel = (TextView) findViewById(R.id.messageLabel);
 
-    senderNameEditText.setText(senderName);
-    msgEditText.setText(message);
+    msgEditText = (EditText) findViewById(R.id.messageText);
+    msgEditText.addTextChangedListener(new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+      }
+
+      @Override
+      public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+      }
+
+      @Override
+      public void afterTextChanged(Editable s) {
+        updateMsgLabel();
+      }
+    });
+
+    updateMsgLabel();
+  }
+  private void updateMsgLabel() {
+    msgLabel.setText(
+        MessageFormat.format("Message ({0}/150):",
+            msgEditText.getText().toString().length())
+    );
+
   }
 
   @Override
