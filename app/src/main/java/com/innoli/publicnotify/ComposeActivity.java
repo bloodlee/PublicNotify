@@ -44,8 +44,9 @@ public class ComposeActivity extends AppCompatActivity {
 //    senderNameEditText = (EditText) findViewById(R.id.sender_input);
 //    msgEditText = (EditText) findViewById(R.id.message_input);
 //
-//    SharedPreferences prefs =
-//        getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE);
+
+    SharedPreferences prefs =
+        getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE);
 //
 //    String senderName = prefs.getString(PreferenceNames.SENDER_NAME_PREF, "");
 //    String message = prefs.getString(PreferenceNames.MESSAGE_PREF, "");
@@ -53,8 +54,12 @@ public class ComposeActivity extends AppCompatActivity {
 //    senderNameEditText.setText(senderName);
 //    msgEditText.setText(message);
 
-    ImageButton editToButton = (ImageButton) findViewById(R.id.editTo);
-    editToButton.setOnClickListener(new View.OnClickListener() {
+//    ImageButton editToButton = (ImageButton) findViewById(R.id.editTo);
+//    editToButton.setOnClickListener(new View.OnClickListener() {
+//    });
+
+    EditText toEditText = (EditText) findViewById(R.id.to_edittext);
+    toEditText.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
         Intent intent = new Intent(ComposeActivity.this, ReceiverInfoActivity.class);

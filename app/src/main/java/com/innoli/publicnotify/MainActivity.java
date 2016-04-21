@@ -17,12 +17,16 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -34,6 +38,9 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.innoli.publicnotify.fragments.AboutFragment;
+import com.innoli.publicnotify.fragments.MessageFragment;
+import com.innoli.publicnotify.fragments.SubscriptionFragment;
 import com.innoli.publicnotify.preferences.PreferenceNames;
 import com.innoli.publicnotify.services.GcmSender;
 import com.innoli.publicnotify.services.LocationProvider;
@@ -129,6 +136,12 @@ public class MainActivity extends AppCompatActivity
   public boolean onCreateOptionsMenu(Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
+
+//    MenuItem item = menu.findItem(R.id.subscribe_switch);
+//    SwitchCompat switchCompat = (SwitchCompat) MenuItemCompat.getActionView(item);
+//
+//    assert switchCompat != null;
+
     return true;
   }
 
@@ -173,23 +186,33 @@ public class MainActivity extends AppCompatActivity
     // Handle navigation view item clicks here.
     int id = item.getItemId();
 
-//    if (id == R.id.nav_camera) {
-//      // Handle the camera action
-//    } else if (id == R.id.nav_gallery) {
-//
-//    } else if (id == R.id.nav_slideshow) {
-//
-//    } else if (id == R.id.nav_manage) {
-//
-//    } else if (id == R.id.nav_share) {
-//
-//    } else if (id == R.id.nav_send) {
-//
-//    }
+    Fragment fragment;
+    Class fragmentClass;
 
-    if (id == R.id.about) {
-      startActivity(new Intent(this, AboutActivity.class));
+    switch (id) {
+      case R.id.about:
+        fragment = AboutFragment.newInstance();
+        break;
+      case R.id.nav_messages:
+        fragment = new MessageFragment();
+        break;
+      case R.id.nav_subscription:
+        fragment = new SubscriptionFragment();
+        break;
+      default:
+        fragment = AboutFragment.newInstance();
+        break;
     }
+    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+    try {
+      ft.replace(R.id.main_fragment, fragment);
+    } catch (Exception e) {
+
+    }
+    ft.addToBackStack(null);
+    ft.commit();
+
+    setTitle(item.getTitle());
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     drawer.closeDrawer(GravityCompat.START);
