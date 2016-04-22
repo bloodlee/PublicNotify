@@ -28,6 +28,7 @@ public class PnGcmListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
         String sender = data.getString("sender");
+        String group = data.getString("group");
 
         String deviceId = data.getString("device_id");
 
@@ -43,6 +44,10 @@ public class PnGcmListenerService extends GcmListenerService {
             sender = "anonymous";
         }
 
+        if (Strings.isNullOrEmpty(group)) {
+            group = "";
+        }
+
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + message);
 
@@ -50,10 +55,10 @@ public class PnGcmListenerService extends GcmListenerService {
 
         }
 
-        sendNotification(sender, message);
+        sendNotification(sender, group, message);
     }
 
-    private void sendNotification(String sender, String message) {
+    private void sendNotification(String sender, String group, String message) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -64,7 +69,8 @@ public class PnGcmListenerService extends GcmListenerService {
                 .setSmallIcon(R.drawable.ic_stat_notification)
                 .setContentTitle("You got a new message!")
                 .setContentText(
-                    MessageFormat.format("{0} from: {1}", message, sender)
+                    MessageFormat.format("{0} from {1}{2}", message, sender,
+                        Strings.isNullOrEmpty(group) ? "" : " in group \"" + group + "\"")
                 )
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)

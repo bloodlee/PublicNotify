@@ -32,33 +32,27 @@ import java.text.MessageFormat;
  */
 public class ComposeActivity extends AppCompatActivity {
 
-  private EditText senderNameEditText;
   private EditText msgEditText;
   private TextView msgLabel;
+  private EditText fromNameEditText;
+  private EditText fromGroupEditText;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_compose);
 
-//    senderNameEditText = (EditText) findViewById(R.id.sender_input);
-//    msgEditText = (EditText) findViewById(R.id.message_input);
-//
-
     SharedPreferences prefs =
         getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE);
-//
-//    String senderName = prefs.getString(PreferenceNames.SENDER_NAME_PREF, "");
-//    String message = prefs.getString(PreferenceNames.MESSAGE_PREF, "");
-//
-//    senderNameEditText.setText(senderName);
-//    msgEditText.setText(message);
 
-//    ImageButton editToButton = (ImageButton) findViewById(R.id.editTo);
-//    editToButton.setOnClickListener(new View.OnClickListener() {
-//    });
+    String toPeople = prefs.getString(PreferenceNames.TO_PEOPLE, "");
+    String toGroup = prefs.getString(PreferenceNames.TO_GROUP, "");
+    String toNearby = prefs.getString(PreferenceNames.TO_NEARBY, "");
 
-    EditText toEditText = (EditText) findViewById(R.id.to_edittext);
+    String fromPeople = prefs.getString(PreferenceNames.FROM_PEOPLE, "");
+    String fromGroup = prefs.getString(PreferenceNames.FROM_GROUP, "");
+
+    EditText toEditText = (EditText) findViewById(R.id.compose_to_edittext);
     toEditText.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -66,6 +60,21 @@ public class ComposeActivity extends AppCompatActivity {
         startActivity(intent);
       }
     });
+
+    toEditText.setHint(MessageFormat.format("To {0} in {1} {2}",
+        Strings.isNullOrEmpty(toPeople) ? "anyone" : toPeople,
+        Strings.isNullOrEmpty(toGroup) ? "any group" : toGroup + " group",
+        Strings.isNullOrEmpty(toNearby) ? "anywhere" : toNearby));
+
+    fromNameEditText = (EditText) findViewById(R.id.compose_name_edittext);
+    if (!Strings.isNullOrEmpty(fromPeople)) {
+      fromNameEditText.setText(fromPeople);
+    }
+
+    fromGroupEditText = (EditText) findViewById(R.id.compose_group_edittext);
+    if (!Strings.isNullOrEmpty(fromGroup)) {
+      fromGroupEditText.setText(fromGroup);
+    }
 
     msgLabel = (TextView) findViewById(R.id.messageLabel);
 
@@ -89,6 +98,7 @@ public class ComposeActivity extends AppCompatActivity {
 
     updateMsgLabel();
   }
+
   private void updateMsgLabel() {
     msgLabel.setText(
         MessageFormat.format("Message ({0}/150):",
@@ -105,17 +115,20 @@ public class ComposeActivity extends AppCompatActivity {
   }
 
   public void sendMessage(MenuItem menu) {
-    String senderName = Strings.nullToEmpty(senderNameEditText.getText().toString());
+    String senderName = Strings.nullToEmpty(fromNameEditText.getText().toString());
+    String senderGroup = Strings.nullToEmpty(fromGroupEditText.getText().toString());
     String message = Strings.nullToEmpty(msgEditText.getText().toString());
 
     SharedPreferences.Editor editor =
         getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE).edit();
-    editor.putString(PreferenceNames.SENDER_NAME_PREF, senderName);
     editor.putString(PreferenceNames.MESSAGE_PREF, message);
+    editor.putString(PreferenceNames.FROM_PEOPLE, senderName);
+    editor.putString(PreferenceNames.FROM_GROUP, senderGroup);
     editor.commit();
 
     Log.d(ComposeActivity.class.getName(),
-        MessageFormat.format("send message {0}: {1}", senderName, message));
+        MessageFormat.format("send message {0} in group {2}: {1}",
+            senderName, message, senderGroup));
 
     int SDK_INT = android.os.Build.VERSION.SDK_INT;
     if (SDK_INT > 8)
@@ -125,7 +138,7 @@ public class ComposeActivity extends AppCompatActivity {
       StrictMode.setThreadPolicy(policy);
     }
 
-    GcmSender.send(senderName, message);
+    GcmSender.send(senderName, senderGroup, message);
 
     Toast toast =
         Toast.makeText(getApplicationContext(), "Message has been sent!", Toast.LENGTH_SHORT);

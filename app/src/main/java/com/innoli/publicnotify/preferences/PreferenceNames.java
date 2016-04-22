@@ -15,4 +15,18 @@ public interface PreferenceNames {
 
   String REGISTRATION_COMPLETE = "registrationComplete";
 
+  String TO_GROUP = "to_group";
+
+  String TO_PEOPLE = "to_people";
+
+  String TO_NEARBY = "to_nearby";
+
+  String FROM_GROUP = "from_group";
+
+  String FROM_PEOPLE = "from_people";
+
+  String FROM_NEARBY = "from_nearby";
+
+  String SUBSCRIBED = "subscribed";
+
 }

@@ -41,7 +41,7 @@ public class GcmSender {
   /**
    * Send notification.
    */
-  public static void send(String sender, String message) {
+  public static void send(String sender, String senderGroup, String message) {
 
     try {
       JSONObject jGcmData = new JSONObject();
@@ -67,6 +67,7 @@ public class GcmSender {
       Log.d(TAG, "device id " + deviceId);
 
       jData.put("sender", sender);
+      jData.put("group", senderGroup);
       jData.put("message", message);
 
       jGcmData.put("to", "/topics/global");
