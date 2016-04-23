@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity
 
   private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
   private static final int REQUEST_CODE_ASK_PERMISSIONS = 999;
+  private SharedPreferences prefs;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity
         startActivity(new Intent(MainActivity.this, ComposeActivity.class));
       }
     });
+
+    prefs = getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE);
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -133,16 +137,41 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
+  public boolean onCreateOptionsMenu(final Menu menu) {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
 
-//    MenuItem item = menu.findItem(R.id.subscribe_switch);
-//    SwitchCompat switchCompat = (SwitchCompat) MenuItemCompat.getActionView(item);
-//
-//    assert switchCompat != null;
+    MenuItem item = menu.findItem(R.id.switchId);
+    final SwitchCompat switchCompat = (SwitchCompat) MenuItemCompat.getActionView(item);
+    switchCompat.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        boolean subscripted = switchCompat.isChecked();
+        updateSubscriptionStatus(menu, switchCompat, subscripted);
+      }
+    });
+
+    Boolean subscribed = prefs.getBoolean(PreferenceNames.SUBSCRIBED, true);
+    updateSubscriptionStatus(menu, switchCompat, subscribed);
 
     return true;
+  }
+
+  private void updateSubscriptionStatus(Menu menu, SwitchCompat switchCompat, Boolean subscribed) {
+    MenuItem item2 = menu.findItem(R.id.switch_status_icon);
+    switchCompat.setChecked(subscribed);
+    item2.setIcon(subscribed ? R.drawable.ic_wifi_on_24dp : R.drawable.ic_wifi_off_24dp);
+
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putBoolean(PreferenceNames.SUBSCRIBED, subscribed);
+    editor.commit();
+
+    Toast toast =
+        Toast.makeText(
+            getApplicationContext(),
+            subscribed ? "Subscription enabled" : "Subscription disabled",
+            Toast.LENGTH_SHORT);
+    toast.show();
   }
 
   @Override

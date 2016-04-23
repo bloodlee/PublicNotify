@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.innoli.publicnotify.MainActivity;
 import com.innoli.publicnotify.R;
+import com.innoli.publicnotify.preferences.PreferenceNames;
 
 import java.text.MessageFormat;
 
@@ -26,6 +28,15 @@ public class PnGcmListenerService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
+        SharedPreferences prefs =
+            getSharedPreferences(PreferenceNames.COMPOSE_MESSAGE_PREF, MODE_PRIVATE);
+
+        Boolean subscribed = prefs.getBoolean(PreferenceNames.SUBSCRIBED, true);
+
+        if (!subscribed) {
+            return;
+        }
+
         String message = data.getString("message");
         String sender = data.getString("sender");
         String group = data.getString("group");

@@ -13,8 +13,8 @@
 
     <string-array name="nearby_distance">
         <item>anywhere</item>
-        <item>500m</item>
-        <item>1000m</item>
+        <item>500m Nearby</item>
+        <item>1000m Nearby</item>
     </string-array>
 
 </resources>

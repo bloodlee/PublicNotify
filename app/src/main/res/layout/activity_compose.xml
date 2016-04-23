@@ -2,8 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     tools:context="com.innoli.publicnotify.ComposeActivity">
 
     <ScrollView
@@ -11,10 +11,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:id="@+id/composite_scrollView"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginBottom="10dp">
+        >
 
         <LinearLayout
             android:orientation="vertical"

@@ -7,6 +7,11 @@
         <!--android:title="@string/action_settings"-->
         <!--app:showAsAction="never"/>-->
     <item
+        android:id="@+id/switch_status_icon"
+        android:title=""
+        app:showAsAction="always"
+        android:icon="@drawable/ic_wifi_on_24dp"/>
+    <item
         android:id="@+id/switchId"
         android:title=""
         app:showAsAction="always"
